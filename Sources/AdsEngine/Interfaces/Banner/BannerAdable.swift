@@ -9,11 +9,6 @@
 import Foundation
 import UIKit
 
-public protocol AdInteractable: AnyObject {
-    func adLoaded()
-    func failedToPresent(dueTo error: Error)
-}
-
 public protocol BannerAdable {
     var identifier: String { get }
     var bannerView: UIView { get set }

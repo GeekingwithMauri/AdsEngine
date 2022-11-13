@@ -8,36 +8,39 @@
 
 import UIKit
 
-final class InterstitialHandler: InterstitialHandleable {
+/// Interstitial agnostic default implementation
+final public class InterstitialHandler: InterstitialHandleable {
     private let adProvider: FullScreenAdInsterstitiable
 
     private var onCompletion: CompletionAction?
 
+    /// Default init
+    /// - Parameter adProvider: ad facade to interact with
     init(adProvider: FullScreenAdInsterstitiable) {
         self.adProvider = adProvider
         self.adProvider.adDelegate = self
     }
 
-    func loadAd() {
+    public func loadAd() {
         adProvider.loadAd()
     }
 
-    func showAd(from rootViewController: UIViewController, onCompletion: @escaping (CompletionAction)) {
+    public func showAd(from rootViewController: UIViewController, onCompletion: @escaping (CompletionAction)) {
         self.onCompletion = onCompletion
         adProvider.showAd(from: rootViewController)
     }
 }
 
 extension InterstitialHandler: InterstitialInteractable {
-    func adLoaded() {
+    public func adLoaded() {
         print("==== Ad loaded =====")
     }
 
-    func failedToPresent(dueTo error: Error) {
+    public func failedToPresent(dueTo error: Error) {
         onCompletion?(.failure(error))
     }
 
-    func dismissed() {
+    public func dismissed() {
         onCompletion?(.success(()))
     }
 }

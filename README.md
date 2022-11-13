@@ -40,7 +40,7 @@ Within the desired place (usually a `ViewController`) where an ad is going to be
 import AdsEngine
 
 class SomeViewController {
-	private lazy var bannerContainer: UIView = {
+    private lazy var bannerContainer: UIView = {
         let container = UIView(frame: .zero)
         container.translatesAutoresizingMaskIntoConstraints = false
 
@@ -71,7 +71,6 @@ extension SomeViewController: AdInteractable {
         print("Banner failed to init due to \(error.localizedDescription)")
     }
 }
-
 ```
 
 ### Interstitial usage

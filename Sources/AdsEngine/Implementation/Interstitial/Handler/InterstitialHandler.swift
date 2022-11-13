@@ -16,7 +16,7 @@ final public class InterstitialHandler: InterstitialHandleable {
 
     /// Default init
     /// - Parameter adProvider: ad facade to interact with
-    init(adProvider: FullScreenAdInsterstitiable) {
+    public init(adProvider: FullScreenAdInsterstitiable) {
         self.adProvider = adProvider
         self.adProvider.adDelegate = self
     }

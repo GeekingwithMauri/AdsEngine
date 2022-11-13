@@ -28,7 +28,7 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
     weak public var adDelegate: InterstitialInteractable?
 
     /// Default init
-    /// - Parameter identifier: interstitial identifier
+    /// - Parameter identifier: interstitial's vendor identifier
     public init(identifier: String) {
         self.adUnitId = identifier
     }

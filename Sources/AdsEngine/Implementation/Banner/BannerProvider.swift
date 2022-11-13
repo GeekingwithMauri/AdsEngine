@@ -24,11 +24,15 @@ final class BannerProvider: NSObject, BannerAdable {
         }
     }
 
+    /// Default init
+    /// - Parameter identifier: banner's vendor identifier
     init(identifier: String) {
         self.identifier = identifier
         bannerView = UIView(frame: .zero)
     }
 
+    /// Initializes the ad
+    /// - Parameter view: container view where the add will be placed and filled its entirety
     func initBannerToBeIncluded(in view: UIView) {
         bannerView = GADBannerView(
             adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(view.bounds.width)

@@ -14,11 +14,12 @@ extension BannerProvider {
     }
 }
 
-final class BannerProvider: NSObject, BannerAdable {
-    var identifier: String
-    var bannerView: UIView
+/// Default implementation for AdMob provider on Banner ads
+final public class BannerProvider: NSObject, BannerAdable {
+    public var identifier: String
+    public var bannerView: UIView
 
-    var adDelegate: AdInteractable? {
+    public var adDelegate: AdInteractable? {
         didSet {
             bannerViewWrapper?.delegate = self
         }
@@ -26,14 +27,14 @@ final class BannerProvider: NSObject, BannerAdable {
 
     /// Default init
     /// - Parameter identifier: banner's vendor identifier
-    init(identifier: String) {
+    public init(identifier: String) {
         self.identifier = identifier
         bannerView = UIView(frame: .zero)
     }
 
     /// Initializes the ad
     /// - Parameter view: container view where the add will be placed and filled its entirety
-    func initBannerToBeIncluded(in view: UIView) {
+    public func initBannerToBeIncluded(in view: UIView) {
         bannerView = GADBannerView(
             adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(view.bounds.width)
         )
@@ -48,7 +49,7 @@ final class BannerProvider: NSObject, BannerAdable {
         ])
     }
 
-    func loadAd(for rootViewController: UIViewController) {
+    public func loadAd(for rootViewController: UIViewController) {
         bannerViewWrapper?.adUnitID = identifier
         bannerViewWrapper?.rootViewController = rootViewController
         bannerViewWrapper?.load(GADRequest())
@@ -56,7 +57,9 @@ final class BannerProvider: NSObject, BannerAdable {
 }
 
 extension BannerProvider: GADBannerViewDelegate {
-    func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
+    /// Notifies its listener that the banner was fully loaded. It's rendered in an fade in animated fashion
+    /// - Parameter bannerView: vendor's banner view
+    public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
         adDelegate?.adLoaded()
         bannerView.alpha = 0
 
@@ -65,8 +68,11 @@ extension BannerProvider: GADBannerViewDelegate {
         }
     }
 
-    func bannerView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: Error) {
+    /// Tells the delegate that the ad failed to present full screen content.
+    /// - Parameters:
+    ///   - bannerView: vendor's banner view
+    ///   - error: culprit of the failure
+    public func bannerView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: Error) {
         adDelegate?.failedToPresent(dueTo: error)
     }
 }
-

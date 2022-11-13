@@ -15,7 +15,7 @@ extension FullScreenAdInsterstitiable {
     }
 }
 
-/// Default implementation for AdMob provider
+/// Default implementation for AdMob provider on Interstitial ads
 final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
     public var adUnitId: String
     

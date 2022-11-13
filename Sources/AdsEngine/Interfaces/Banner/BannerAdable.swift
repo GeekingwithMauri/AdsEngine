@@ -14,10 +14,10 @@ public protocol BannerAdable {
     /// Ad identifier
     var identifier: String { get }
 
-    /// Ad object reference.
+    /// Ad's view reference.
     var bannerView: UIView { get set }
 
-    /// Ad's delegate.
+    /// Ad's delegate. Once set, it binds with 3rd-party ad's interaction delegate
     var adDelegate: AdInteractable? { get set }
 
     /// Initializes the ad

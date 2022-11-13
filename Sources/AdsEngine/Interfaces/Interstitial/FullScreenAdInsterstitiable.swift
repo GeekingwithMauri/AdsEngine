@@ -20,7 +20,7 @@ public protocol FullScreenAdInsterstitiable: AnyObject {
     /// Ad identifier
     var adUnitId: String { get }
 
-    /// Ad object reference. Once set, it binds with 3rd-party ad's interaction delegate
+    /// Ad's object reference. Once set, it should bind with 3rd-party ad's interaction delegate
     var interstitial: NSObject? { get set }
 
     /// Ad's delegate

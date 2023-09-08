@@ -9,7 +9,7 @@ _AdsEngine_ centralizes the ad's SDKs and exposes them via facades.
 ## What's the point?
 Contracts expire, SDKs get deprecated and fees rises. These, just to mention a few, are valid reasons to change ad's vendors. 
 
-This is rather hard when our codebases are littered with direct SDKs implementations. _AdsEngine_ makes such processes painless by making their consumption behind a facade. This is why, whatever happens under the hood shall not concern our Tracking clients apps.
+This is rather hard when our codebases are littered with direct SDKs implementations. _AdsEngine_ makes such processes painless by making their consumption behind a facade. This is why, whatever happens under the hood shall not concern our clients apps.
 
 ## Installation 
 ### Xcode 13

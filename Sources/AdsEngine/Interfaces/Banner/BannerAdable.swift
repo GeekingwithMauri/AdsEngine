@@ -17,11 +17,11 @@ public protocol BannerAdable {
     /// Ad's view reference.
     var bannerView: UIView { get set }
 
-    /// Ad's delegate. Once set, it binds with 3rd-party ad's interaction delegate
+    /// Ad's delegate. Once set, it binds with the 3rd-party ad's interaction delegate
     var adDelegate: AdInteractable? { get set }
 
     /// Initializes the ad
-    /// - Parameter view: container view where the add will be placed.
+    /// - Parameter view: container view where the ad will be placed.
     func initBannerToBeIncluded(in view: UIView)
 
     /// Triggers ad loading. This should be called as soon as possible to prevent latency

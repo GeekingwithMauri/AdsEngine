@@ -33,7 +33,7 @@ final public class BannerProvider: NSObject, BannerAdable {
     }
 
     /// Initializes the ad
-    /// - Parameter view: container view where the add will be placed and filled its entirety
+    /// - Parameter view: container view where the ad will be placed and filled its entirety
     public func initBannerToBeIncluded(in view: UIView) {
         bannerView = GADBannerView(
             adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(view.bounds.width)
@@ -51,6 +51,7 @@ final public class BannerProvider: NSObject, BannerAdable {
 
     public func loadAd(for rootViewController: UIViewController) {
         bannerViewWrapper?.adUnitID = identifier
+        bannerViewWrapper?.adSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(bannerView.frame.width)
         bannerViewWrapper?.rootViewController = rootViewController
         bannerViewWrapper?.load(GADRequest())
     }

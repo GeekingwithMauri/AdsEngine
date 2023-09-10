@@ -9,6 +9,11 @@
 import Foundation
 import UIKit
 
+public enum InterstitialError: Error {
+    case noAnchorController
+    case adNotPresentable(String)
+}
+
 /// Type of result from interstitial actions
 public typealias CompletionAction = (Result<Void, Error>) -> (Void)
 

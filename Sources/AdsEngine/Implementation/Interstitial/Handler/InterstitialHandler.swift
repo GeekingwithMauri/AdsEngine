@@ -33,11 +33,11 @@ final public class InterstitialHandler: InterstitialHandleable {
 
 extension InterstitialHandler: InterstitialInteractable {
     public func adLoaded() {
-        print("==== Ad loaded =====")
+        print("==== Interstitial ad loaded =====")
     }
 
     public func failedToPresent(dueTo error: Error) {
-        onCompletion?(.failure(error))
+        onCompletion?(.failure(InterstitialError.adNotPresentable(error.localizedDescription)))
     }
 
     public func dismissed() {

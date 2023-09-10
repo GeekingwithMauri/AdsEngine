@@ -19,7 +19,8 @@ final public class BannerProvider: NSObject, BannerAdable {
     public var identifier: String
     public var bannerView: UIView
 
-    public var adDelegate: AdInteractable? {
+    /// Banner delegate to notify its listener of ad events
+    public weak var adDelegate: AdInteractable? {
         didSet {
             bannerViewWrapper?.delegate = self
         }

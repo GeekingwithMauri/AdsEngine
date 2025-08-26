@@ -9,8 +9,8 @@
 import GoogleMobileAds
 
 extension BannerProvider {
-    var bannerViewWrapper: GADBannerView? {
-        bannerView as? GADBannerView
+    var bannerViewWrapper: BannerView? {
+        bannerView as? BannerView
     }
 }
 
@@ -28,53 +28,98 @@ final public class BannerProvider: NSObject, BannerAdable {
 
     /// Default init
     /// - Parameter identifier: banner's vendor identifier
-    public init(identifier: String) {
+    public init(
+        identifier: String
+    ) {
         self.identifier = identifier
-        bannerView = UIView(frame: .zero)
+        bannerView = UIView(
+            frame: .zero
+        )
     }
-
+    
     /// Initializes the ad
     /// - Parameter view: container view where the ad will be placed and filled its entirety
-    public func initBannerToBeIncluded(in view: UIView) {
-        bannerView = GADBannerView(
-            adSize: GADCurrentOrientationInlineAdaptiveBannerAdSizeWithWidth(view.bounds.width)
+    public func initBannerToBeIncluded(
+        in view: UIView
+    ) {
+        bannerView = BannerView(
+            adSize: currentOrientationInlineAdaptiveBanner(
+                width: view.bounds.width
+            )
         )
         bannerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(bannerView)
-
-        NSLayoutConstraint.activate([
-            bannerView.topAnchor.constraint(equalTo: view.topAnchor),
-            bannerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            bannerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            bannerView.widthAnchor.constraint(equalTo: view.widthAnchor)
-        ])
+        view
+            .addSubview(
+                bannerView
+            )
+        
+        NSLayoutConstraint
+            .activate(
+                [
+                    bannerView.topAnchor
+                        .constraint(
+                            equalTo: view.topAnchor
+                        ),
+                    bannerView.bottomAnchor
+                        .constraint(
+                            equalTo: view.bottomAnchor
+                        ),
+                    bannerView.centerXAnchor
+                        .constraint(
+                            equalTo: view.centerXAnchor
+                        ),
+                    bannerView.widthAnchor
+                        .constraint(
+                            equalTo: view.widthAnchor
+                        )
+                ]
+            )
     }
-
-    public func loadAd(for rootViewController: UIViewController) {
+    
+    public func loadAd(
+        for rootViewController: UIViewController
+    ) {
         bannerViewWrapper?.adUnitID = identifier
-        bannerViewWrapper?.adSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(bannerView.frame.width)
+        bannerViewWrapper?.adSize = currentOrientationAnchoredAdaptiveBanner(
+            width: bannerView.frame.width
+        )
         bannerViewWrapper?.rootViewController = rootViewController
-        bannerViewWrapper?.load(GADRequest())
+        bannerViewWrapper?
+            .load(
+                Request()
+            )
     }
 }
 
-extension BannerProvider: GADBannerViewDelegate {
+extension BannerProvider: BannerViewDelegate {
     /// Notifies its listener that the banner was fully loaded. It's rendered in an fade in animated fashion
     /// - Parameter bannerView: vendor's banner view
-    public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
-        adDelegate?.adLoaded()
+    public func bannerViewDidReceiveAd(
+        _ bannerView: BannerView
+    ) {
+        adDelegate?
+            .adLoaded()
         bannerView.alpha = 0
-
-        UIView.animate(withDuration: 1) {
-            bannerView.alpha = 1
-        }
+        
+        UIView
+            .animate(
+                withDuration: 1
+            ) {
+                bannerView.alpha = 1
+            }
     }
-
+    
     /// Tells the delegate that the ad failed to present full screen content.
     /// - Parameters:
     ///   - bannerView: vendor's banner view
     ///   - error: culprit of the failure
-    public func bannerView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: Error) {
-        adDelegate?.failedToPresent(dueTo: error)
+    public func bannerView(
+        _ bannerView: BannerView,
+        didFailToReceiveAdWithError error: Error
+    ) {
+        adDelegate?
+            .failedToPresent(
+                dueTo: error
+            )
     }
 }

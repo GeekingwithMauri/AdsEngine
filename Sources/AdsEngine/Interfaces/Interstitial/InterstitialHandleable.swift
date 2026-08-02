@@ -14,6 +14,19 @@ public enum InterstitialError: Error {
     case adNotPresentable(String)
 }
 
+extension InterstitialError: LocalizedError {
+    /// Human-readable description — this is what reaches analytics, so the
+    /// default "operation couldn't be completed" would bury the actual cause.
+    public var errorDescription: String? {
+        switch self {
+        case .noAnchorController:
+            return "No anchor view controller to present the ad from"
+        case .adNotPresentable(let context):
+            return "Ad not presentable: \(context)"
+        }
+    }
+}
+
 /// Type of result from interstitial actions
 public typealias CompletionAction = (Result<Void, Error>) -> (Void)
 
@@ -24,5 +37,8 @@ public protocol InterstitialHandleable: AnyObject {
 
     /// Shows the ad on full screen. Main thread is highly recommended upon implementation
     /// - Parameter rootViewController: anchor view controller from where the ad will be launched
-    func showAd(from rootViewController: UIViewController, onCompletion: @escaping (CompletionAction))
+    func showAd(
+        from rootViewController: UIViewController,
+        onCompletion: @escaping (CompletionAction)
+    )
 }

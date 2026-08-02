@@ -10,14 +10,23 @@ import UIKit
 
 /// Interstitial agnostic default implementation
 final public class InterstitialHandler: InterstitialHandleable {
+    private static let maxLoadRetries = 2
+
     private let adProvider: FullScreenAdInsterstitiable
+    private let retryDelay: TimeInterval
 
     private var onCompletion: CompletionAction?
+    private var loadRetriesLeft = InterstitialHandler.maxLoadRetries
 
     /// Default init
     /// - Parameter adProvider: ad facade to interact with
-    public init(adProvider: FullScreenAdInsterstitiable) {
+    /// - Parameter retryDelay: seconds between load retries after a failed ad request
+    public init(
+        adProvider: FullScreenAdInsterstitiable,
+        retryDelay: TimeInterval = 10
+    ) {
         self.adProvider = adProvider
+        self.retryDelay = retryDelay
         self.adProvider.adDelegate = self
     }
 
@@ -43,11 +52,13 @@ final public class InterstitialHandler: InterstitialHandleable {
 
 extension InterstitialHandler: InterstitialInteractable {
     public func adLoaded() {
+        loadRetriesLeft = Self.maxLoadRetries
         print("==== Interstitial ad loaded =====")
     }
 
     public func failedToPresent(dueTo error: Error) {
         consumeCompletion(with: .failure(InterstitialError.adNotPresentable(error.localizedDescription)))
+        retryShouldTheAdRequestHaveFailed(error)
     }
 
     public func dismissed() {
@@ -60,5 +71,20 @@ extension InterstitialHandler: InterstitialInteractable {
     private func consumeCompletion(with result: Result<Void, Error>) {
         onCompletion?(result)
         onCompletion = nil
+    }
+
+    /// A failed ad request (no fill, flaky network — `failedInit`) retries a
+    /// couple of times with a pause; without this, one failure at session start
+    /// leaves the whole session ad-less. Present-time failures don't retry
+    /// here — the provider already requests fresh inventory for those.
+    private func retryShouldTheAdRequestHaveFailed(_ error: Error) {
+        guard error is InterstitialCustomError, loadRetriesLeft > 0 else {
+            return
+        }
+
+        loadRetriesLeft -= 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) { [weak self] in
+            self?.loadAd()
+        }
     }
 }

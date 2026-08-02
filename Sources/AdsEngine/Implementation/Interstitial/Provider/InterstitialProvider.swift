@@ -60,8 +60,9 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
                                                 additionalContext: error.localizedDescription
                                             )
                                     )
+                                return
                             }
-                            
+
                             self?.interstitial = loadedAd
                             self?.adDelegate?.adLoaded()
                         }
@@ -91,23 +92,31 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
 
 extension InterstitialProvider: FullScreenContentDelegate {
     /// Tells the delegate that the ad failed to present full screen content.
+    ///
+    /// The failed ad is discarded and a fresh one requested: interstitials are
+    /// one-shot, so keeping the reference around only guarantees the next
+    /// `showAd` fails the same way.
     public func ad(
         _ ad: FullScreenPresentingAd,
         didFailToPresentFullScreenContentWithError error: Error
     ) {
+        interstitial = nil
         adDelegate?
             .failedToPresent(
                 dueTo: error
             )
+        loadAd()
     }
-    
+
     /// Tells the delegate that the ad dismissed full screen content.
     ///
-    /// It also preloads the next ad.
+    /// It also discards the now-consumed ad (presenting it again is an error)
+    /// and preloads the next one.
     /// [Source](https://developers.google.com/admob/ios/interstitial#register_for_callbacks)
     public func adDidDismissFullScreenContent(
         _ ad: FullScreenPresentingAd
     ) {
+        interstitial = nil
         adDelegate?
             .dismissed()
         loadAd()

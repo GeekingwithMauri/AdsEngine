@@ -9,11 +9,16 @@
 import UIKit
 
 /// Interstitial agnostic default implementation
+/// Deferred-execution seam for load retries: production waits on the main
+/// queue, tests run the work inline so they stay linear — no run-loop polling.
+public typealias RetryScheduler = (TimeInterval, @escaping () -> Void) -> Void
+
 final public class InterstitialHandler: InterstitialHandleable {
     private static let maxLoadRetries = 2
 
     private let adProvider: FullScreenAdInsterstitiable
     private let retryDelay: TimeInterval
+    private let retryScheduler: RetryScheduler
 
     private var onCompletion: CompletionAction?
     private var loadRetriesLeft = InterstitialHandler.maxLoadRetries
@@ -21,12 +26,20 @@ final public class InterstitialHandler: InterstitialHandleable {
     /// Default init
     /// - Parameter adProvider: ad facade to interact with
     /// - Parameter retryDelay: seconds between load retries after a failed ad request
+    /// - Parameter retryScheduler: how the delayed retry gets executed
     public init(
         adProvider: FullScreenAdInsterstitiable,
-        retryDelay: TimeInterval = 10
+        retryDelay: TimeInterval = 10,
+        retryScheduler: @escaping RetryScheduler = { delay, work in
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + delay,
+                execute: work
+            )
+        }
     ) {
         self.adProvider = adProvider
         self.retryDelay = retryDelay
+        self.retryScheduler = retryScheduler
         self.adProvider.adDelegate = self
     }
 
@@ -83,7 +96,7 @@ extension InterstitialHandler: InterstitialInteractable {
         }
 
         loadRetriesLeft -= 1
-        DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) { [weak self] in
+        retryScheduler(retryDelay) { [weak self] in
             self?.loadAd()
         }
     }

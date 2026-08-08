@@ -91,6 +91,15 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
 }
 
 extension InterstitialProvider: FullScreenContentDelegate {
+    /// Tells the delegate that the vendor recorded an impression for the ad.
+    /// - Parameter ad: vendor's full screen ad
+    public func adDidRecordImpression(
+        _ ad: FullScreenPresentingAd
+    ) {
+        adDelegate?
+            .adDidRecordImpression()
+    }
+
     /// Tells the delegate that the ad failed to present full screen content.
     ///
     /// The failed ad is discarded and a fresh one requested: interstitials are

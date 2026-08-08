@@ -109,6 +109,15 @@ extension BannerProvider: BannerViewDelegate {
             }
     }
     
+    /// Tells the delegate that the vendor recorded an impression for the banner.
+    /// - Parameter bannerView: vendor's banner view
+    public func bannerViewDidRecordImpression(
+        _ bannerView: BannerView
+    ) {
+        adDelegate?
+            .adDidRecordImpression()
+    }
+
     /// Tells the delegate that the ad failed to present full screen content.
     /// - Parameters:
     ///   - bannerView: vendor's banner view

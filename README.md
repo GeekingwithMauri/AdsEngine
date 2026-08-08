@@ -73,6 +73,11 @@ extension SomeViewController: AdInteractable {
 }
 ```
 
+`AdInteractable` also offers `adDidRecordImpression()`, the vendor's own "this ad
+was seen" signal. It defaults to a no-op — the conformer above is complete
+without it — so implement it only if you count ad exposure. Prefer it over
+`adLoaded()` for that: an ad can load and never be rendered.
+
 ### Interstitial usage
 _pending doc_
 

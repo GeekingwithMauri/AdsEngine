@@ -34,6 +34,17 @@ let package = Package(
                 ),
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .testTarget(
+            name: "AdsEngineTests",
+            dependencies: [
+                "AdsEngine",
+                .product(
+                    name: "GoogleMobileAds",
+                    package: "swift-package-manager-google-mobile-ads"
+                ),
+            ],
+            swiftSettings: [.swiftLanguageMode(.v5)]
         )
     ]
 )

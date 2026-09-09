@@ -19,6 +19,9 @@ final public class BannerProvider: NSObject, BannerAdable {
     public var identifier: String
     public var bannerView: UIView
 
+    private let size: BannerAdSize
+    private let requestOptions: AdRequestOptions
+
     /// Banner delegate to notify its listener of ad events
     public weak var adDelegate: AdInteractable? {
         didSet {
@@ -27,24 +30,33 @@ final public class BannerProvider: NSObject, BannerAdable {
     }
 
     /// Default init
-    /// - Parameter identifier: banner's vendor identifier
+    /// - Parameters:
+    ///   - identifier: banner's vendor identifier
+    ///   - size: the ad size to request. Defaults to anchored-adaptive at the
+    ///     container's width, which is what this provider always did.
+    ///   - requestOptions: what to stamp on every request. Defaults to a
+    ///     personalized request — the vendor default.
     public init(
-        identifier: String
+        identifier: String,
+        size: BannerAdSize = .anchoredAdaptive,
+        requestOptions: AdRequestOptions = .personalized
     ) {
         self.identifier = identifier
+        self.size = size
+        self.requestOptions = requestOptions
         bannerView = UIView(
             frame: .zero
         )
     }
-    
+
     /// Initializes the ad
     /// - Parameter view: container view where the ad will be placed and filled its entirety
     public func initBannerToBeIncluded(
         in view: UIView
     ) {
         bannerView = BannerView(
-            adSize: currentOrientationInlineAdaptiveBanner(
-                width: view.bounds.width
+            adSize: size.resolved(
+                containerWidth: view.bounds.width
             )
         )
         bannerView.translatesAutoresizingMaskIntoConstraints = false
@@ -81,13 +93,13 @@ final public class BannerProvider: NSObject, BannerAdable {
     ) {
         AdsConfigurator.leaveAudioSessionToTheApp()
         bannerViewWrapper?.adUnitID = identifier
-        bannerViewWrapper?.adSize = currentOrientationAnchoredAdaptiveBanner(
-            width: bannerView.frame.width
+        bannerViewWrapper?.adSize = size.resolved(
+            containerWidth: bannerView.frame.width
         )
         bannerViewWrapper?.rootViewController = rootViewController
         bannerViewWrapper?
             .load(
-                Request()
+                requestOptions.makeRequest()
             )
     }
 }

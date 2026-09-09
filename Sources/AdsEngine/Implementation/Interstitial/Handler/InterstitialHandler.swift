@@ -66,7 +66,6 @@ final public class InterstitialHandler: InterstitialHandleable {
 extension InterstitialHandler: InterstitialInteractable {
     public func adLoaded() {
         loadRetriesLeft = Self.maxLoadRetries
-        print("==== Interstitial ad loaded =====")
     }
 
     public func failedToPresent(dueTo error: Error) {

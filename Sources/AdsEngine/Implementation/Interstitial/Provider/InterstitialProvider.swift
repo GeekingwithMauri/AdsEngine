@@ -27,18 +27,34 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
 
     weak public var adDelegate: InterstitialInteractable?
 
+    private let autoReload: Bool
+    private let requestOptions: AdRequestOptions
+
     /// Default init
-    /// - Parameter identifier: interstitial's vendor identifier
+    /// - Parameters:
+    ///   - identifier: interstitial's vendor identifier
+    ///   - autoReload: whether a dismissed or failed presentation immediately
+    ///     requests the next ad. Defaults to `true` — the vendor-recommended
+    ///     always-ready posture. A consumer that shows at most one interstitial
+    ///     per some external gate (and would otherwise burn a request on an ad
+    ///     that never renders) passes `false` and drives `loadAd()` itself.
+    ///   - requestOptions: what to stamp on every request. Defaults to a
+    ///     personalized request — the vendor default.
     public init(
-        identifier: String
+        identifier: String,
+        autoReload: Bool = true,
+        requestOptions: AdRequestOptions = .personalized
     ) {
         self.adUnitId = identifier
+        self.autoReload = autoReload
+        self.requestOptions = requestOptions
     }
-    
+
     /// Loads the ad on a background queue. Upon load completion, `interstitial` reference is set and `InterstitialInteractable` notifies its listener
     public func loadAd() {
         AdsConfigurator.leaveAudioSessionToTheApp()
         let vendorId = adUnitId
+        let request = requestOptions.makeRequest()
 
         DispatchQueue
             .global(
@@ -48,7 +64,7 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
                 InterstitialAd
                     .load(
                         with: vendorId,
-                        request: Request(),
+                        request: request,
                         completionHandler: {
                             [weak self] loadedAd,
                             error in
@@ -84,11 +100,6 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
         }
     }
     
-    deinit {
-        print(
-            "+++++ Deallocated interstitial ++++++"
-        )
-    }
 }
 
 extension InterstitialProvider: FullScreenContentDelegate {
@@ -115,7 +126,7 @@ extension InterstitialProvider: FullScreenContentDelegate {
             .failedToPresent(
                 dueTo: error
             )
-        loadAd()
+        reloadIfAutomatic()
     }
 
     /// Tells the delegate that the ad dismissed full screen content.
@@ -129,6 +140,18 @@ extension InterstitialProvider: FullScreenContentDelegate {
         interstitial = nil
         adDelegate?
             .dismissed()
+        reloadIfAutomatic()
+    }
+
+    /// The auto-ready posture: after a show ends (dismissed or failed), request
+    /// the next ad. Suppressed when the consumer opted out of auto-reload — it
+    /// preloads on its own schedule, and an extra request here is one it never
+    /// asked for and may never render.
+    private func reloadIfAutomatic() {
+        guard autoReload else {
+            return
+        }
+
         loadAd()
     }
 }

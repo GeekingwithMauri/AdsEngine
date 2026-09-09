@@ -79,6 +79,7 @@ final public class BannerProvider: NSObject, BannerAdable {
     public func loadAd(
         for rootViewController: UIViewController
     ) {
+        AdsConfigurator.leaveAudioSessionToTheApp()
         bannerViewWrapper?.adUnitID = identifier
         bannerViewWrapper?.adSize = currentOrientationAnchoredAdaptiveBanner(
             width: bannerView.frame.width

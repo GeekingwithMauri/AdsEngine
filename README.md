@@ -81,6 +81,20 @@ without it — so implement it only if you count ad exposure. Prefer it over
 ### Interstitial usage
 _pending doc_
 
+## Your audio session stays yours
+
+AdMob ships configured to drive the host app's `AVAudioSession` around its video
+creatives — it sets the category to `.ambient` while they're muted and
+`.soloAmbient` when one unmutes, both of which the Ring/Silent switch silences.
+An app that plays its own sound through a silenced phone therefore goes quiet the
+moment an ad is requested, and stays quiet, since nothing restores the category.
+
+_AdsEngine_ turns that off for you on the first ad request: the vendor still
+handles audio inside its own creatives, it just stops rewriting your category.
+Nothing to call. If you actually want the SDK holding the session, set
+`MobileAds.shared.audioVideoManager.isAudioSessionApplicationManaged = false`
+after your first `loadAd`.
+
 ## Testing 
 _pending doc_
 

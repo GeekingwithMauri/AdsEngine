@@ -37,8 +37,9 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
     
     /// Loads the ad on a background queue. Upon load completion, `interstitial` reference is set and `InterstitialInteractable` notifies its listener
     public func loadAd() {
+        AdsConfigurator.leaveAudioSessionToTheApp()
         let vendorId = adUnitId
-        
+
         DispatchQueue
             .global(
                 qos: .background

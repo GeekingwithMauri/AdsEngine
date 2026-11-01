@@ -66,12 +66,34 @@ final public class BannerProvider: NSObject, BannerAdable {
                 containerWidth: view.bounds.width
             )
         )
+        pin(in: view)
+    }
+
+    /// Moves the banner, loaded or loading, into another container and
+    /// presents its click-through from `rootViewController`. Its ad is kept:
+    /// nothing is requested. For a banner loaded before the screen that shows
+    /// it exists.
+    /// - Parameters:
+    ///   - view: the new container, filled the same way as the first
+    ///   - rootViewController: the controller that now holds the banner
+    public func rehost(
+        in view: UIView,
+        rootViewController: UIViewController
+    ) {
+        bannerView.removeFromSuperview()
+        pin(in: view)
+        bannerViewWrapper?.rootViewController = rootViewController
+    }
+
+    private func pin(
+        in view: UIView
+    ) {
         bannerView.translatesAutoresizingMaskIntoConstraints = false
         view
             .addSubview(
                 bannerView
             )
-        
+
         NSLayoutConstraint
             .activate(
                 [

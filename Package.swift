@@ -12,12 +12,26 @@ let package = Package(
             name: "AdsEngine",
             targets: ["AdsEngine"]
         ),
+        // Opt-in: links the mediation adapters, so consumers of `AdsEngine`
+        // alone do not pull in the extra ad networks.
+        .library(
+            name: "AdsEngineMediation",
+            targets: ["AdsEngineMediation"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(
             url: "https://github.com/googleads/swift-package-manager-google-mobile-ads.git",
             .upToNextMajor(from: "13.0.0")
+        ),
+        .package(
+            url: "https://github.com/googleads/googleads-mobile-ios-mediation-liftoffmonetize.git",
+            exact: "7.7.800"
+        ),
+        .package(
+            url: "https://github.com/googleads/googleads-mobile-ios-mediation-unity.git",
+            exact: "4.21.000"
         )
     ],
     targets: [
@@ -31,6 +45,21 @@ let package = Package(
                 .product(
                     name: "GoogleMobileAds",
                     package: "swift-package-manager-google-mobile-ads"
+                ),
+            ],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .target(
+            name: "AdsEngineMediation",
+            dependencies: [
+                "AdsEngine",
+                .product(
+                    name: "LiftoffMonetizeAdapterTarget",
+                    package: "googleads-mobile-ios-mediation-liftoffmonetize"
+                ),
+                .product(
+                    name: "UnityAdapterTarget",
+                    package: "googleads-mobile-ios-mediation-unity"
                 ),
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]

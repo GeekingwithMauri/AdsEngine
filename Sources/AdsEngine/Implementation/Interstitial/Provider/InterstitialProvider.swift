@@ -19,16 +19,14 @@ extension FullScreenAdInsterstitiable {
 final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
     public var adUnitId: String
     
-    public var interstitial: NSObject? {
-        didSet {
-            interstitialWrapper?.fullScreenContentDelegate = self
-        }
-    }
+    /// The loaded ad. Its delegate is this provider, attached by the loader.
+    public var interstitial: NSObject?
 
     weak public var adDelegate: InterstitialInteractable?
 
     private let autoReload: Bool
     private let requestOptions: AdRequestOptions
+    private let loadStrategy: AdLoadStrategy
 
     /// Default init
     /// - Parameters:
@@ -40,14 +38,18 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
     ///     that never renders) passes `false` and drives `loadAd()` itself.
     ///   - requestOptions: what to stamp on every request. Defaults to a
     ///     personalized request — the vendor default.
+    ///   - loadStrategy: how the request reaches the vendor. Defaults to the
+    ///     vendor's own call.
     public init(
         identifier: String,
         autoReload: Bool = true,
-        requestOptions: AdRequestOptions = .personalized
+        requestOptions: AdRequestOptions = .personalized,
+        loadStrategy: AdLoadStrategy = .vendor
     ) {
         self.adUnitId = identifier
         self.autoReload = autoReload
         self.requestOptions = requestOptions
+        self.loadStrategy = loadStrategy
     }
 
     /// Loads the ad on a background queue. Upon load completion, `interstitial` reference is set and `InterstitialInteractable` notifies its listener
@@ -55,35 +57,37 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
         AdsConfigurator.leaveAudioSessionToTheApp()
         let vendorId = adUnitId
         let request = requestOptions.makeRequest()
+        let load = loadStrategy.interstitial
 
         DispatchQueue
             .global(
                 qos: .background
             )
             .async { [weak self] in
-                InterstitialAd
-                    .load(
-                        with: vendorId,
-                        request: request,
-                        completionHandler: {
-                            [weak self] loadedAd,
-                            error in
-                            if let error = error {
-                                self?.adDelegate?
-                                    .failedToPresent(
-                                        dueTo: InterstitialCustomError
-                                            .failedInit(
-                                                vendorId: vendorId,
-                                                additionalContext: error.localizedDescription
-                                            )
-                                    )
-                                return
-                            }
+                guard let self else {
+                    return
+                }
 
-                            self?.interstitial = loadedAd
-                            self?.adDelegate?.adLoaded()
-                        }
-                    )
+                load(
+                    vendorId,
+                    request,
+                    self
+                ) { [weak self] loadedAd, error in
+                    if let error = error {
+                        self?.adDelegate?
+                            .failedToPresent(
+                                dueTo: InterstitialCustomError
+                                    .failedInit(
+                                        vendorId: vendorId,
+                                        additionalContext: error.localizedDescription
+                                    )
+                            )
+                        return
+                    }
+
+                    self?.interstitial = loadedAd
+                    self?.adDelegate?.adLoaded()
+                }
             }
     }
     

@@ -21,13 +21,11 @@ final public class BannerProvider: NSObject, BannerAdable {
 
     private let size: BannerAdSize
     private let requestOptions: AdRequestOptions
+    private let loadStrategy: AdLoadStrategy
 
-    /// Banner delegate to notify its listener of ad events
-    public weak var adDelegate: AdInteractable? {
-        didSet {
-            bannerViewWrapper?.delegate = self
-        }
-    }
+    /// Banner delegate to notify its listener of ad events. The vendor view's
+    /// delegate is this provider, attached by the loader on every load.
+    public weak var adDelegate: AdInteractable?
 
     /// Default init
     /// - Parameters:
@@ -36,14 +34,18 @@ final public class BannerProvider: NSObject, BannerAdable {
     ///     container's width, which is what this provider always did.
     ///   - requestOptions: what to stamp on every request. Defaults to a
     ///     personalized request — the vendor default.
+    ///   - loadStrategy: how the request reaches the vendor. Defaults to the
+    ///     vendor's own call.
     public init(
         identifier: String,
         size: BannerAdSize = .anchoredAdaptive,
-        requestOptions: AdRequestOptions = .personalized
+        requestOptions: AdRequestOptions = .personalized,
+        loadStrategy: AdLoadStrategy = .vendor
     ) {
         self.identifier = identifier
         self.size = size
         self.requestOptions = requestOptions
+        self.loadStrategy = loadStrategy
         bannerView = UIView(
             frame: .zero
         )
@@ -97,10 +99,15 @@ final public class BannerProvider: NSObject, BannerAdable {
             containerWidth: bannerView.frame.width
         )
         bannerViewWrapper?.rootViewController = rootViewController
-        bannerViewWrapper?
-            .load(
-                requestOptions.makeRequest()
-            )
+        guard let bannerViewWrapper else {
+            return
+        }
+
+        loadStrategy.banner(
+            bannerViewWrapper,
+            requestOptions.makeRequest(),
+            self
+        )
     }
 }
 

@@ -18,6 +18,11 @@ let package = Package(
             name: "AdsEngineMediation",
             targets: ["AdsEngineMediation"]
         ),
+        // Opt-in: reports ad events to RevenueCat through its AdMob adapter.
+        .library(
+            name: "AdsEngineRevenueCat",
+            targets: ["AdsEngineRevenueCat"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -32,6 +37,12 @@ let package = Package(
         .package(
             url: "https://github.com/googleads/googleads-mobile-ios-mediation-unity.git",
             exact: "4.21.000"
+        ),
+        // Each adapter release pins `purchases-ios-spm` to its own version, so
+        // a range lets the consumer's RevenueCat version pick the adapter.
+        .package(
+            url: "https://github.com/RevenueCat/purchases-ios-admob.git",
+            .upToNextMajor(from: "5.100.0")
         )
     ],
     targets: [
@@ -60,6 +71,17 @@ let package = Package(
                 .product(
                     name: "UnityAdapterTarget",
                     package: "googleads-mobile-ios-mediation-unity"
+                ),
+            ],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .target(
+            name: "AdsEngineRevenueCat",
+            dependencies: [
+                "AdsEngine",
+                .product(
+                    name: "RevenueCatAdMob",
+                    package: "purchases-ios-admob"
                 ),
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]

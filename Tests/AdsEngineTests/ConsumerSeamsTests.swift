@@ -53,16 +53,26 @@ final class ConsumerSeamsTests: XCTestCase {
     /// slot the ad lands in, not asking the view to guess.
     func test_anchoredAdaptiveHonoursAnExplicitWidth() {
         let explicit = BannerAdSize.anchoredAdaptive(width: 320).resolved(containerWidth: 9_999)
-        let expected = currentOrientationAnchoredAdaptiveBanner(width: 320)
 
         XCTAssertEqual(
-            explicit.size.height,
-            expected.size.height
+            explicit.size.width,
+            320
         )
         XCTAssertNotEqual(
-            explicit.size.height,
-            BannerAdSize.anchoredAdaptive.resolved(containerWidth: 9_999).size.height,
+            explicit.size.width,
+            BannerAdSize.anchoredAdaptive.resolved(containerWidth: 9_999).size.width,
             "A pinned width and the container width resolved to the same banner — the pin did nothing"
+        )
+    }
+
+    /// The adaptive banner never grows past the standard 50 pt: SDK 13's only
+    /// anchored size doubles it at a 320 pt width.
+    func test_anchoredAdaptiveIsCappedAtTheStandardHeight() {
+        let resolved = BannerAdSize.anchoredAdaptive(width: 320).resolved(containerWidth: 9_999)
+
+        XCTAssertEqual(
+            resolved.size.height,
+            AdSizeBanner.size.height
         )
     }
 

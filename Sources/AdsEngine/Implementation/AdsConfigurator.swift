@@ -10,6 +10,14 @@ import GoogleMobileAds
 
 /// One-time SDK configuration that must run before the first ad request.
 public enum AdsConfigurator {
+    /// The strategy a provider built without one loads with, given its
+    /// placement. Read on every load, so a change reaches providers that
+    /// already exist. Defaults to the vendor's own call; an opt-in product
+    /// replaces it once at launch, before the first `loadAd`.
+    public static var loadStrategy: (_ placement: String?) -> AdLoadStrategy = { _ in
+        .vendor
+    }
+
     /// Registers physical devices that should receive Google test ads on live
     /// ad units. Pass the hashed ids the SDK prints to the console on the
     /// device's first ad request ("To get test ads on this device, set: …").
@@ -37,8 +45,7 @@ public enum AdsConfigurator {
     /// and to `.soloAmbient` when one unmutes. **Both are silenced by the Ring/Silent
     /// switch.** So an app that deliberately plays through a silenced phone — game
     /// sound, a meditation cue — goes quiet the moment an ad is requested, and stays
-    /// quiet, because nothing puts its category back. That is the library half of
-    /// mchirino89/MatchWord#303.
+    /// quiet, because nothing puts its category back.
     ///
     /// On by default rather than an opt-in a consumer has to know exists: an ads
     /// library reaching into the host's audio session is the surprise, not this. The

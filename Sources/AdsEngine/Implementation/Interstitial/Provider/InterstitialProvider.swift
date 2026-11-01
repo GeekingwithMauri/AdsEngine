@@ -26,7 +26,8 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
 
     private let autoReload: Bool
     private let requestOptions: AdRequestOptions
-    private let loadStrategy: AdLoadStrategy
+    private let placement: String?
+    private let loadStrategy: AdLoadStrategy?
 
     /// Default init
     /// - Parameters:
@@ -38,17 +39,21 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
     ///     that never renders) passes `false` and drives `loadAd()` itself.
     ///   - requestOptions: what to stamp on every request. Defaults to a
     ///     personalized request — the vendor default.
-    ///   - loadStrategy: how the request reaches the vendor. Defaults to the
-    ///     vendor's own call.
+    ///   - placement: a stable label for where the ad shows, for event
+    ///     reporting. Never a dynamic value.
+    ///   - loadStrategy: how the request reaches the vendor. `nil` reads
+    ///     `AdsConfigurator.loadStrategy` on every load.
     public init(
         identifier: String,
         autoReload: Bool = true,
         requestOptions: AdRequestOptions = .personalized,
-        loadStrategy: AdLoadStrategy = .vendor
+        placement: String? = nil,
+        loadStrategy: AdLoadStrategy? = nil
     ) {
         self.adUnitId = identifier
         self.autoReload = autoReload
         self.requestOptions = requestOptions
+        self.placement = placement
         self.loadStrategy = loadStrategy
     }
 
@@ -57,7 +62,7 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
         AdsConfigurator.leaveAudioSessionToTheApp()
         let vendorId = adUnitId
         let request = requestOptions.makeRequest()
-        let load = loadStrategy.interstitial
+        let load = (loadStrategy ?? AdsConfigurator.loadStrategy(placement)).interstitial
 
         DispatchQueue
             .global(

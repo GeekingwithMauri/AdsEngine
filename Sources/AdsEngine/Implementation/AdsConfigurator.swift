@@ -20,6 +20,16 @@ public enum AdsConfigurator {
         MobileAds.shared.requestConfiguration.testDeviceIdentifiers = identifiers
     }
 
+    /// Starts the Google Mobile Ads SDK. Bidding mediation adapters need it
+    /// running before the first request, so call it once at launch, after any
+    /// privacy configuration and before the first `loadAd`. Calling it again is
+    /// harmless: the vendor ignores repeat starts.
+    public static func start() {
+        guaranteeMainThread {
+            MobileAds.shared.start(completionHandler: nil)
+        }
+    }
+
     /// Leaves the process's `AVAudioSession` to the host app.
     ///
     /// `audioSessionIsApplicationManaged` ships as `false`, and the vendor spells out

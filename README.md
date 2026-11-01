@@ -95,6 +95,23 @@ Nothing to call. If you actually want the SDK holding the session, set
 `MobileAds.shared.audioVideoManager.isAudioSessionApplicationManaged = false`
 after your first `loadAd`.
 
+## Mediation (opt-in)
+
+The `AdsEngineMediation` product links two bidding adapters, Liftoff Monetize and Unity Ads, on top of `AdsEngine`. The `AdsEngine` product does not link them, so add `AdsEngineMediation` to your target only if you want them. Each network also needs its SKAdNetwork identifiers in your `Info.plist`, and the networks enabled in your AdMob mediation groups.
+
+Call order, once at launch and before the first request:
+
+```swift
+import AdsEngine
+import AdsEngineMediation
+
+MediationPrivacy.optOutOfPersonalisedAds() // 1. privacy, per network
+AdsConfigurator.start()                    // 2. start the SDK
+// 3. then any loadAd
+```
+
+`npa=1` on the Google request binds Google only, so `optOutOfPersonalisedAds()` passes the equivalent signal to each network (it tells both the user has not consented and has opted out of sale). `AdsConfigurator.start()` is also in the core product; bidding adapters need the SDK started before their first request.
+
 ## Testing 
 _pending doc_
 

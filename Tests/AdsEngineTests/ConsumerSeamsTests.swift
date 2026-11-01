@@ -65,14 +65,33 @@ final class ConsumerSeamsTests: XCTestCase {
         )
     }
 
-    /// The adaptive banner never grows past the standard 50 pt: SDK 13's only
-    /// anchored size doubles it at a 320 pt width.
-    func test_anchoredAdaptiveIsCappedAtTheStandardHeight() {
-        let resolved = BannerAdSize.anchoredAdaptive(width: 320).resolved(containerWidth: 9_999)
+    /// The ceiling never exceeds what the deprecated anchored size served
+    /// (measured on SDK 13) and is at most 1 pt short of it.
+    func test_anchoredCeilingTracksTheDeprecatedAnchoredHeights() {
+        let widths: [CGFloat] = [320, 375, 390, 393, 402, 414, 428, 430, 440]
+        let measured: [CGFloat] = [50, 59, 61, 61, 63, 65, 67, 67, 68]
+
+        XCTAssertEqual(
+            widths.map { BannerAdSize.anchoredCeiling(width: $0) },
+            [50, 58, 60, 61, 62, 64, 66, 67, 68]
+        )
+        XCTAssertEqual(
+            zip(
+                widths,
+                measured
+            ).filter { BannerAdSize.anchoredCeiling(width: $0) > $1 }.count,
+            0,
+            "The ceiling lets a banner grow taller than it was"
+        )
+    }
+
+    /// The resolved size carries the ceiling, not SDK 13's doubled "large" height.
+    func test_anchoredAdaptiveResolvesToTheCeiling() {
+        let resolved = BannerAdSize.anchoredAdaptive(width: 390).resolved(containerWidth: 9_999)
 
         XCTAssertEqual(
             resolved.size.height,
-            AdSizeBanner.size.height
+            60
         )
     }
 

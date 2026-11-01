@@ -66,15 +66,29 @@ public enum BannerAdSize: Sendable, Equatable {
     /// The fixed 320×50 `AdSizeBanner`.
     case standard
 
-    /// Adaptive width, height capped at the standard banner's 50 pt. `nil`
-    /// defers to the container's own width at load time, which is the
+    /// Adaptive width, height no taller than the deprecated anchored size gave.
+    /// `nil` defers to the container's own width at load time, which is the
     /// provider's historical behavior.
     ///
     /// SDK 13 deprecates the current-orientation anchored size; its only
-    /// anchored replacement, the "large" one, serves up to 100 pt at a 320 pt
-    /// width. The inline adaptive size with a 50 pt ceiling keeps the slot the
-    /// height it had (the header recommends a ceiling of 50 or more).
+    /// anchored replacement, the "large" one, serves 100 pt at a 320 pt width.
+    /// The inline adaptive size takes a ceiling instead: `anchoredCeiling`.
     case anchoredAdaptive(width: CGFloat?)
+
+    /// The deprecated anchored size, measured on SDK 13 (width → height, pt):
+    /// 320→50, 375→59, 390→61, 393→61, 402→63, 414→65, 428→67, 430→67, 440→68.
+    /// `width / 6.4` rounded down tracks it within 1 pt and never above it;
+    /// the vendor bounds anchored banners to 50...90.
+    // ponytail: a fit, not the vendor's formula; re-measure if a new width ships.
+    static func anchoredCeiling(width: CGFloat) -> CGFloat {
+        min(
+            max(
+                (width / 6.4).rounded(.down),
+                AdSizeBanner.size.height
+            ),
+            90
+        )
+    }
 
     /// Anchored adaptive at the container's width — the pre-seam default.
     public static var anchoredAdaptive: BannerAdSize { .anchoredAdaptive(width: nil) }
@@ -84,9 +98,10 @@ public enum BannerAdSize: Sendable, Equatable {
         case .standard:
             return AdSizeBanner
         case .anchoredAdaptive(let width):
+            let resolvedWidth = width ?? containerWidth
             return inlineAdaptiveBanner(
-                width: width ?? containerWidth,
-                maxHeight: AdSizeBanner.size.height
+                width: resolvedWidth,
+                maxHeight: Self.anchoredCeiling(width: resolvedWidth)
             )
         }
     }

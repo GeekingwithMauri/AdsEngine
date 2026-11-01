@@ -1,5 +1,5 @@
 {
-  "originHash" : "c787f057c4c4b8ba96ab1f5ec02c3ece9a80b6241d4d9b0e511f134f050c8104",
+  "originHash" : "846e6a156a0f2ded0b892cc68f25b8f63b74872c3e0d2e491a53e8d4257f71ec",
   "pins" : [
     {
       "identity" : "googleads-mobile-ios-mediation-liftoffmonetize",
@@ -17,6 +17,24 @@
       "state" : {
         "revision" : "188967a5c062987496cd276b83dc25e84f87d9a6",
         "version" : "4.21.0"
+      }
+    },
+    {
+      "identity" : "purchases-ios-admob",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios-admob.git",
+      "state" : {
+        "revision" : "18132cb14864de2e38795e402014eb2e89a6a143",
+        "version" : "5.100.0"
+      }
+    },
+    {
+      "identity" : "purchases-ios-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios-spm.git",
+      "state" : {
+        "revision" : "14a93c5a1b35710fd16bb42ac1a4cdc12b172a70",
+        "version" : "5.100.0"
       }
     },
     {

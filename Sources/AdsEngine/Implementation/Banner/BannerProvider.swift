@@ -21,7 +21,8 @@ final public class BannerProvider: NSObject, BannerAdable {
 
     private let size: BannerAdSize
     private let requestOptions: AdRequestOptions
-    private let loadStrategy: AdLoadStrategy
+    private let placement: String?
+    private let loadStrategy: AdLoadStrategy?
 
     /// Banner delegate to notify its listener of ad events. The vendor view's
     /// delegate is this provider, attached by the loader on every load.
@@ -34,17 +35,21 @@ final public class BannerProvider: NSObject, BannerAdable {
     ///     container's width, which is what this provider always did.
     ///   - requestOptions: what to stamp on every request. Defaults to a
     ///     personalized request — the vendor default.
-    ///   - loadStrategy: how the request reaches the vendor. Defaults to the
-    ///     vendor's own call.
+    ///   - placement: a stable label for where the banner shows, for event
+    ///     reporting. Never a dynamic value.
+    ///   - loadStrategy: how the request reaches the vendor. `nil` reads
+    ///     `AdsConfigurator.loadStrategy` on every load.
     public init(
         identifier: String,
         size: BannerAdSize = .anchoredAdaptive,
         requestOptions: AdRequestOptions = .personalized,
-        loadStrategy: AdLoadStrategy = .vendor
+        placement: String? = nil,
+        loadStrategy: AdLoadStrategy? = nil
     ) {
         self.identifier = identifier
         self.size = size
         self.requestOptions = requestOptions
+        self.placement = placement
         self.loadStrategy = loadStrategy
         bannerView = UIView(
             frame: .zero
@@ -103,7 +108,7 @@ final public class BannerProvider: NSObject, BannerAdable {
             return
         }
 
-        loadStrategy.banner(
+        (loadStrategy ?? AdsConfigurator.loadStrategy(placement)).banner(
             bannerViewWrapper,
             requestOptions.makeRequest(),
             self

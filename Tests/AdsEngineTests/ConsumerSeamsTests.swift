@@ -53,7 +53,7 @@ final class ConsumerSeamsTests: XCTestCase {
     /// slot the ad lands in, not asking the view to guess.
     func test_anchoredAdaptiveHonoursAnExplicitWidth() {
         let explicit = BannerAdSize.anchoredAdaptive(width: 320).resolved(containerWidth: 9_999)
-        let expected = currentOrientationAnchoredAdaptiveBanner(width: 320)
+        let expected = largeAnchoredAdaptiveBanner(width: 320)
 
         XCTAssertEqual(
             explicit.size.height,

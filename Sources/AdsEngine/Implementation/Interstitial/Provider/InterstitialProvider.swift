@@ -60,7 +60,7 @@ final public class InterstitialProvider: NSObject, FullScreenAdInsterstitiable {
             .global(
                 qos: .background
             )
-            .async {
+            .async { [weak self] in
                 InterstitialAd
                     .load(
                         with: vendorId,

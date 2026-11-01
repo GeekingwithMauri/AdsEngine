@@ -78,7 +78,7 @@ public enum BannerAdSize: Sendable, Equatable {
         case .standard:
             return AdSizeBanner
         case .anchoredAdaptive(let width):
-            return currentOrientationAnchoredAdaptiveBanner(width: width ?? containerWidth)
+            return largeAnchoredAdaptiveBanner(width: width ?? containerWidth)
         }
     }
 

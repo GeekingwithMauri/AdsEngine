@@ -66,8 +66,14 @@ public enum BannerAdSize: Sendable, Equatable {
     /// The fixed 320×50 `AdSizeBanner`.
     case standard
 
-    /// Anchored adaptive for `width`. `nil` defers to the container's own width
-    /// at load time, which is the provider's historical behavior.
+    /// Adaptive width, height capped at the standard banner's 50 pt. `nil`
+    /// defers to the container's own width at load time, which is the
+    /// provider's historical behavior.
+    ///
+    /// SDK 13 deprecates the current-orientation anchored size; its only
+    /// anchored replacement, the "large" one, serves up to 100 pt at a 320 pt
+    /// width. The inline adaptive size with a 50 pt ceiling keeps the slot the
+    /// height it had (the header recommends a ceiling of 50 or more).
     case anchoredAdaptive(width: CGFloat?)
 
     /// Anchored adaptive at the container's width — the pre-seam default.
@@ -78,7 +84,10 @@ public enum BannerAdSize: Sendable, Equatable {
         case .standard:
             return AdSizeBanner
         case .anchoredAdaptive(let width):
-            return largeAnchoredAdaptiveBanner(width: width ?? containerWidth)
+            return inlineAdaptiveBanner(
+                width: width ?? containerWidth,
+                maxHeight: AdSizeBanner.size.height
+            )
         }
     }
 

@@ -18,15 +18,20 @@ public enum MediationPrivacy {
     ///
     /// Both networks document the call at developers.google.com/admob/ios/mediation
     /// (`/liftoff-monetize` and `/unity`, § privacy):
-    /// - Liftoff Monetize: `VunglePrivacySettings.setCCPAStatus(_ optIn:)`.
-    ///   `true` is opt-in, so `false` is the opt-out passed here.
+    /// - Liftoff Monetize: `VunglePrivacySettings.setCCPAStatus(_ optIn:)` and
+    ///   `setGDPRStatus(_ optIn:)`. `true` is opt-in, so `false` is passed to both.
     /// - Unity Ads: the page shows `UADSMetaData` `privacy.consent`, which the SDK
-    ///   now deprecates in favour of `UnityAds.setUserConsent(_:)` (`true` when
-    ///   the user granted consent for personalised ads). `false` is passed here.
+    ///   now deprecates. Its headers name three replacements, each set here:
+    ///   `setNonBehavioral(true)` ("Enables the display of contextual
+    ///   (non-personalized) ads"), `setUserOptOut(true)` (opts out of data
+    ///   collection) and `setUserConsent(false)` (no consent for personalised ads).
     ///
     /// Neither vendor exposes a getter, so the call cannot be read back.
     public static func optOutOfPersonalisedAds() {
         VunglePrivacySettings.setCCPAStatus(false)
+        VunglePrivacySettings.setGDPRStatus(false)
+        UnityAds.setNonBehavioral(true)
+        UnityAds.setUserOptOut(true)
         UnityAds.setUserConsent(false)
     }
 }
